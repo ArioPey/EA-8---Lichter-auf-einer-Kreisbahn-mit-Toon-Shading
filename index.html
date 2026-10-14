@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lichter auf einer Kreisbahn mit Toon Shading</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <h1>Lichter auf einer Kreisbahn mit Toon&nbsp;Shading</h1>
+  <p>Dynamische Beleuchtung einer Szene mit zwei bewegten Lichtquellen – umschaltbar zwischen Phong-Beleuchtung und Cel-/Toon-Shader (WebGL, Fragment-Shader).</p>
+</header>
+
+<main>
+  <section class="stage">
+    <div class="canvas-wrap">
+      <canvas id="gl" tabindex="0" aria-label="3D-Szene mit zwei kreisenden Lichtern"></canvas>
+      <div class="hud" aria-live="polite">
+        <span id="hud-shader">Shader: Phong</span>
+        <span id="hud-angle">Lichtwinkel: 0°</span>
+      </div>
+      <p id="error" class="error" hidden></p>
+    </div>
+    <div class="buttons">
+      <button id="btn-light" type="button">Lichter weiterbewegen (L)</button>
+      <button id="btn-toon" type="button">Toon-Shader an/aus (T)</button>
+      <button id="btn-reset" type="button">Ansicht zurücksetzen (R)</button>
+    </div>
+  </section>
+
+  <section class="docs">
+    <h2>Bedienung</h2>
+    <table>
+      <thead><tr><th>Eingabe</th><th>Wirkung</th></tr></thead>
+      <tbody>
+        <tr><td><kbd>L</kbd> oder <kbd>l</kbd></td><td>Beide Lichter bewegen sich gleichzeitig um einen festen Schritt (15°) auf ihrer Kreisbahn um die Objekte. Shift hat keinen Effekt. Die Lichter sind unabhängig von der Kamera.</td></tr>
+        <tr><td><kbd>T</kbd> oder <kbd>t</kbd></td><td>Toon-Shader ein- bzw. ausschalten.</td></tr>
+        <tr><td>Maus ziehen</td><td>Kamera um die Szene drehen (zeigt, dass die Lichter nicht an der Kamera hängen).</td></tr>
+        <tr><td>Mausrad</td><td>Zoomen.</td></tr>
+        <tr><td><kbd>R</kbd></td><td>Kamera zurücksetzen (zusätzlich, nicht gefordert).</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Das Canvas muss für die Tasten den Fokus haben; ein Klick auf die Szene genügt (beim Laden ist der Fokus bereits gesetzt).</p>
+
+    <h2>Bearbeitete Aufgaben und Erweiterungen</h2>
+    <ul>
+      <li><strong>Grundaufgabe:</strong> Zwei farbige Lichtquellen (warmweiß und blau), die per Taste <kbd>L</kbd> schrittweise gemeinsam auf einer Kreisbahn um die Modelle laufen. Die Lichtpositionen liegen im Weltkoordinatensystem, nicht im Kamerasystem. Kleine leuchtende Kugeln und ein Ring markieren Lichter und Bahn.</li>
+      <li><strong>Erweiterung Toon-Shader:</strong> Cel-Shading im Fragment-Shader, per <kbd>T</kbd> schaltbar. Die Farben der Objekte bleiben erhalten.</li>
+    </ul>
+
+    <h2>Umsetzung</h2>
+    <ul>
+      <li><strong>Beleuchtung:</strong> Per-Fragment-Phong mit ambientem, diffusem und spekularem Anteil (Blinn-Phong-Halbvektor), summiert über beide Lichter. Berechnung im Weltkoordinatensystem.</li>
+      <li><strong>Lichtbahn:</strong> Position <code>(R·cos(a + k·π), h, R·sin(a + k·π))</code> mit <code>k = 0, 1</code>, also liegen die Lichter einander gegenüber. Jeder Tastendruck erhöht <code>a</code> um 15°.</li>
+      <li><strong>Toon-Shading:</strong> Der diffuse Anteil <code>N·L</code> wird in vier harte Stufen quantisiert. Der Glanzpunkt wird mit einer Schwelle (<code>step</code>) zu einem scharfen Fleck. Eine Kontur entsteht dort, wo die Normale fast senkrecht zur Blickrichtung steht (<code>N·V</code> klein). Das ist eine Näherung ohne zusätzlichen Render-Durchgang.</li>
+      <li><strong>Szene:</strong> Kugel, Würfel, Torus und Boden sind prozedural erzeugt, es werden keine externen Bibliotheken oder Modelldateien benötigt.</li>
+    </ul>
+
+    <h2>Test und QA</h2>
+    <ul>
+      <li>Shader-Kompilier- und Linkfehler werden im Log der Browser-Konsole ausgegeben und über dem Canvas angezeigt.</li>
+      <li>Getestet werden sollte: <kbd>L</kbd> mehrfach (auch mit Shift), <kbd>T</kbd> mehrfach, Kamera drehen während die Lichter laufen, Fenstergröße ändern.</li>
+    </ul>
+
+    <h2>Quellen</h2>
+    <ul>
+      <li><a href="http://de.wikipedia.org/wiki/Cel_Shading">Wikipedia (de): Cel Shading</a></li>
+      <li><a href="http://en.wikipedia.org/wiki/Cel_shading">Wikipedia (en): Cel shading</a></li>
+      <li><a href="http://en.wikibooks.org/wiki/GLSL_Programming/Unity/Toon_Shading">Wikibooks: GLSL Programming / Unity / Toon Shading</a></li>
+      <li><a href="https://webglsamples.org/toon-shading/toon-shading.html">WebGL Samples: Toon Shading (Demo)</a></li>
+      <li>Phong-/Blinn-Phong-Beleuchtungsmodell, Lerneinheit BEL (Kap. 14.9).</li>
+    </ul>
+    <p class="note">Der gesamte Code (<code>main.js</code>) wurde eigenständig für diese Aufgabe geschrieben; die genannten Quellen dienten als Verständnisgrundlage für das Toon-Shading.</p>
+  </section>
+</main>
+
+<footer>Lichter auf einer Kreisbahn mit Toon Shading · WebGL</footer>
+<script src="main.js"></script>
+</body>
+</html>
